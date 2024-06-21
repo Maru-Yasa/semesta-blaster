@@ -33,13 +33,27 @@ async function main() {
     
         const numbers = JSON.parse(fs.readFileSync(numberFile, 'utf8'));
         let message = fs.readFileSync(messageFile, 'utf8');
-    
-        for (let number of numbers) {
-            await delay(getRandomDelay(10, 15));
-            let dynamicMessage = message.replace('{nama_peserta}', number["nama_peserta"]);
         
-            await sendMessage(sock, number['nomer_hp'], dynamicMessage, imagePath);
-            consola.success(`Messages sent to ${number['nomer_hp']}`);
+        let chunkSize = 1_000;
+        let secondPerChunk = 60_000;
+        let secondPerMessage = 1_000;
+
+        // make chunks
+        let chunks = [];
+        for (let i = 0; i < numbers.length; i += chunkSize) {
+            let chunk = numbers.slice(i, i + chunkSize);
+            chunks.push(chunk);
+        }
+
+        for (let chunk of chunks) {
+            for (let number of chunk) {
+                await delay(secondPerMessage);
+                let dynamicMessage = message.replace('{nama_peserta}', number["nama_peserta"]);
+        
+                await sendMessage(sock, number['nomer_hp'], dynamicMessage, imagePath);
+                consola.success(`Messages sent to ${number['nomer_hp']}`);
+            }
+            await delay(secondPerChunk);
         }
     
     } catch (error) {
