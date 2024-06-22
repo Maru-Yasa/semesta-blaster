@@ -36,7 +36,7 @@ async function main() {
         
         let chunkSize = 1_000;
         let secondPerChunk = 60_000;
-        let secondPerMessage = 1_000;
+        let secondPerMessage = 500;
 
         // make chunks
         let chunks = [];
